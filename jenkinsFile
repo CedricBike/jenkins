@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        NODE_VERSION = '18' // Assure-toi que cette version est installée sur l'agent
+        NODE_VERSION = '21.7.0' // Assure-toi que cette version est installée sur l'agent
     }
 
     stages {
