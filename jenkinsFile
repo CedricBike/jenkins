@@ -1,69 +1,49 @@
 pipeline {
-    agent any  // Runs on any available agent
-
-    environment {
-                GIT_REPO = 'https://github.com/CedricBike/jenkins.git'
-    }
-
+    agent any
     stages {
         stage('Checkout') {
             steps {
-                script {
-                    echo 'Cloning repository...'
-                    git branch: 'master', url: env.GIT_REPO 
-                }
+                 git url: 'https://github.com/cedric-bike/jenkins.git', branch: 'master'
             }
         }
 
         stage('Install Dependencies') {
             steps {
                 script {
-                    echo 'Installing dependencies...'
-                    sh 'npm install'  // Change this based on your project (e.g., 'mvn install' for Java)
+                    def nodeInstalled = sh(script: 'which node', returnStatus: true) == 0
+                    if (!nodeInstalled) {
+                        error("Node.js n'est pas installé sur l'agent Jenkins")
+                    }
                 }
+                sh 'npm install'
             }
         }
 
         stage('Run Tests') {
             steps {
-                script {
-                    echo 'Running tests...'
-                    sh 'npm test'  // Change based on your project (e.g., 'mvn test' for Java)
-                }
+                sh 'npm test' // Si tu n’as pas de tests, tu peux enlever cette étape
             }
         }
 
-        stage('Build') {
+        stage('Build App') {
             steps {
-                script {
-                    echo 'Building project...'
-                    sh 'npm run build'  // Modify as needed
-                }
+                sh 'npm run build'
             }
         }
 
-        stage('Deploy') {
-            when {
-                branch 'main'  // Deploy only when on the 'main' branch
-            }
+        stage('Start App') {
             steps {
-                script {
-                    echo 'Deploying application...'
-                    sh 'npm run deploy'  // Modify this for your deployment process
-                }
+                sh 'npm run start' // ou `npm run start:dev` si c'est en mode développement
             }
         }
     }
 
     post {
-        always {
-            echo 'Pipeline execution finished.'
-        }
         success {
-            echo 'Build successful!'
+            echo '🚀 Déploiement réussi !'
         }
         failure {
-            echo 'Build failed!'
+            echo '❌ Erreur pendant l’exécution du pipeline'
         }
     }
 }
