@@ -7,17 +7,26 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
-            steps {
+        stage('Install Node.js & Dependencies') {
+             steps {
                 script {
                     def nodeInstalled = sh(script: 'which node', returnStatus: true) == 0
                     if (!nodeInstalled) {
-                        error("Node.js n'est pas installé sur l'agent Jenkins")
+                        sh 'curl -fsSL https://deb.nodesource.com/setup_18.x | bash -'
+                        sh 'apt-get install -y nodejs'
                     }
                 }
                 sh 'npm install'
-            }
-        }
+    }
+}
+
+        stage('Install Dependencies') {
+            steps {
+                cache(path: 'node_modules', key: 'npm-cache') {
+                    sh 'npm install'
+                }
+    }
+}
 
         stage('Run Tests') {
             steps {
