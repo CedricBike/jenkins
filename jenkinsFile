@@ -8,9 +8,8 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                 git branch: 'master', 
+                 git branch: 'master',
                      url: 'https://github.com/cedric-bike/jenkins.git',
-                     credentialsId: 'cdw'
             }
         }
 
