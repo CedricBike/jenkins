@@ -9,13 +9,12 @@ pipeline {
 
         stage('Install Node.js & Dependencies') {
              steps {
-                script {
-                    def nodeInstalled = sh(script: 'which node', returnStatus: true) == 0
-                    if (!nodeInstalled) {
-                        sh 'curl -fsSL https://deb.nodesource.com/setup_18.x | bash -'
-                        sh 'apt-get install -y nodejs'
-                    }
-                }
+                stage('Install Node.js & Dependencies') {
+    steps {
+        sh 'which node || (curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && apt-get install -y nodejs)'
+        sh 'npm install'
+    }
+}
                 sh 'npm install'
     }
 }
