@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://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@github.com/CedricBike/jenkins.git' // Remplace par l'URL de ton repo
+               git credientialsId: 'jenkins', url: 'https://github.com/cedric-bike/jenkins.git'
             }
         }
 
