@@ -1,0 +1,54 @@
+pipeline {
+    agent any
+
+    environment {
+        NODE_VERSION = '18' // Assure-toi que cette version est installée sur l'agent
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/ton-repo/ton-projet.git' // Remplace par l'URL de ton repo
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                script {
+                    def nodeInstalled = sh(script: 'which node', returnStatus: true) == 0
+                    if (!nodeInstalled) {
+                        error("Node.js n'est pas installé sur l'agent Jenkins")
+                    }
+                }
+                sh 'npm install'
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                sh 'npm test' // Si tu n’as pas de tests, tu peux enlever cette étape
+            }
+        }
+
+        stage('Build App') {
+            steps {
+                sh 'npm run build'
+            }
+        }
+
+        stage('Start App') {
+            steps {
+                sh 'npm run start' // ou `npm run start:dev` si c'est en mode développement
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '🚀 Déploiement réussi !'
+        }
+        failure {
+            echo '❌ Erreur pendant l’exécution du pipeline'
+        }
+    }
+}
